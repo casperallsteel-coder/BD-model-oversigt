@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BD Konfigurator - Ropox</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="topbar">
+        <div class="logo-container">
+            <span class="logo-text">all steel</span>
+            <span class="logo-subtext">BY ROPOX</span>
+        </div>
+        <nav style="display:flex;align-items:center;gap:0.5rem;">
+            <button id="btn-nav-user" class="nav-button" style="font-weight: 600; color: var(--primary-color);">Søgning BD</button>
+            <button id="btn-nav-admin" class="nav-button" style="font-size:0.9rem;color:#9ca3af;text-decoration:none;">⚙ Konfigurator (Admin)</button>
+        </nav>
+    </header>
+
+    <main id="app-container">
+        <!-- View: Bruger (User) -->
+        <section id="view-user" class="view active">
+            <div class="header-action">
+                <h1>Find BD Affaldsstation</h1>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">Vælg hvor mange fraktioner/rum kunden ønsker, og vælg derefter indkast for at finde den korrekte BD station.</p>
+            </div>
+            
+            <div class="card-form">
+                <div class="form-group" style="max-width: 300px;">
+                    <label for="u-rooms">Antal rum / fraktioner</label>
+                    <select id="u-rooms">
+                        <option value="1">1 rum</option>
+                        <option value="2">2 rum</option>
+                        <option value="3" selected>3 rum</option>
+                        <option value="4">4 rum</option>
+                        <option value="5">5 rum</option>
+                        <option value="6">6 rum</option>
+                    </select>
+                </div>
+
+                <div class="form-section-title">Vælg indkast</div>
+                <div id="u-inlets-container" class="form-row" style="flex-wrap: wrap;">
+                    <!-- Dropdowns for each room generated via JS -->
+                </div>
+
+                <div class="form-actions" style="margin-top: 2rem;">
+                    <button id="btn-find-config" class="primary-button w-full" style="font-size: 1.2rem; padding: 1rem;">Søg Løsning</button>
+                </div>
+            </div>
+
+            <!-- Resultater -->
+            <div id="u-results-wrapper" style="margin-top: 2rem;">
+                <!-- Resultater genereres her via JS -->
+            </div>
+
+            <!-- Not found container -->
+            <div id="u-not-found-container" class="card-form hidden" style="margin-top: 2rem; border-color: var(--danger); text-align: center;">
+                <h2 style="color: var(--danger); margin-bottom: 1rem;">Ingen løsning fundet</h2>
+                <p style="margin-bottom: 1.5rem;">Der findes endnu ikke en færdig BD station med præcis denne kombination af indkast.</p>
+                <button id="btn-create-proposal" class="primary-button">Ønsker du denne oprettet?</button>
+            </div>
+        </section>
+
+        <!-- View: Konfigurator (Admin) -->
+        <section id="view-admin" class="view">
+            <div class="header-action">
+                <h1>Konfigurator (Databasestyring)</h1>
+            </div>
+            
+            <div class="detail-grid">
+                <!-- Administrer Grunddata -->
+                <div class="card-form" style="padding: 1.5rem;">
+                    <h2 style="margin-bottom: 1rem; color: var(--text-main);">Administrer Grunddata</h2>
+                    
+                    <div class="form-group">
+                        <label>Tilføj ny Stel Størrelse</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" id="a-new-size" placeholder="F.eks. BD XXXL">
+                            <button id="btn-add-size" class="secondary-button">Tilføj</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">
+                        <label>Slet eksisterende Størrelse</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <select id="a-delete-size-select" style="flex: 1;"></select>
+                            <button id="btn-delete-size" class="danger-button">Slet</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 2rem;">
+                        <label>Tilføj nyt Indkast (Vare nr + Navn)</label>
+                        <div style="display: flex; gap: 0.5rem; flex-direction: column;">
+                            <input type="text" id="a-new-inlet-id" placeholder="ID (f.eks. 313)">
+                            <input type="text" id="a-new-inlet-name" placeholder="Navn (f.eks. Rektangle 250x150)">
+                            <button id="btn-add-inlet" class="secondary-button">Tilføj Indkast</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">
+                        <label>Slet eksisterende Indkast</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <select id="a-delete-inlet-select" style="flex: 1;"></select>
+                            <button id="btn-delete-inlet" class="danger-button">Slet</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opret ny BD Station -->
+                <div class="card-form" style="padding: 1.5rem; border-color: var(--primary-color);">
+                    <h2 style="margin-bottom: 1rem; color: var(--primary-color);">Opret Færdigt Stel</h2>
+                    
+                    <div class="form-group">
+                        <label>Stel Størrelse</label>
+                        <select id="a-config-size"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Antal Rum</label>
+                        <select id="a-config-rooms">
+                            <option value="1">1 rum</option>
+                            <option value="2">2 rum</option>
+                            <option value="3" selected>3 rum</option>
+                            <option value="4">4 rum</option>
+                            <option value="5">5 rum</option>
+                            <option value="6">6 rum</option>
+                        </select>
+                    </div>
+
+                    <div class="form-section-title">Indkast pr. rum</div>
+                    <div id="a-config-inlets-container" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <!-- Dropdowns via JS -->
+                    </div>
+
+                    <div class="form-section-title">Varenumre & Tilvalg</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Færdig Monteret Varenr.</label>
+                            <input type="text" id="a-config-montage" placeholder="F.eks. 15041035-67">
+                        </div>
+                        <div class="form-group">
+                            <label>Låg Varenr.</label>
+                            <input type="text" id="a-config-lid" placeholder="F.eks. 15041042-37">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row" style="margin-bottom: 1.5rem;">
+                        <label style="display:flex; align-items:center; gap:0.5rem; font-weight:normal; cursor:pointer;">
+                            <input type="checkbox" id="a-config-wheels" style="width: auto; margin:0;"> Hjul
+                        </label>
+                        <label style="display:flex; align-items:center; gap:0.5rem; font-weight:normal; cursor:pointer;">
+                            <input type="checkbox" id="a-config-weight" style="width: auto; margin:0;"> Vægtklods
+                        </label>
+                        <label style="display:flex; align-items:center; gap:0.5rem; font-weight:normal; cursor:pointer;">
+                            <input type="checkbox" id="a-config-gas" style="width: auto; margin:0;"> Gasdæmper
+                        </label>
+                    </div>
+
+                    <button id="btn-save-config" class="primary-button w-full" style="margin-top: 1rem;">Gem BD Station i Database</button>
+                </div>
+            </div>
+
+            <!-- Liste over gemte konfigurationer -->
+            <div class="card-form" style="margin-top: 2rem;">
+                <h2 style="margin-bottom: 1rem; color: var(--text-main);">Gemte BD Stationer</h2>
+                <input type="text" id="a-search-configs" placeholder="Søg på størrelse, varenummer eller indkast..." style="margin-bottom: 1.5rem; padding: 0.75rem; width: 100%; border: 1px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
+                <div id="a-configs-list-container" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <!-- Liste genereret fra JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
