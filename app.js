@@ -132,6 +132,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <p style="font-family: monospace; font-size: 1.2rem;">${config.lidItem || '-'}</p>
                         </div>
                         <div class="info-group">
+                            <h3>Farve / Overflade</h3>
+                            <p style="font-size: 1.1rem;">${config.color || 'Standard'}</p>
+                        </div>
+                        <div class="info-group">
                             <h3>Tilvalg</h3>
                             <p style="font-size: 1rem;">${optionsText}</p>
                         </div>
@@ -171,6 +175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const aConfigInletsContainer = document.getElementById('a-config-inlets-container');
     const aConfigMontageInput = document.getElementById('a-config-montage');
     const aConfigLidInput = document.getElementById('a-config-lid');
+    const aConfigColorInput = document.getElementById('a-config-color');
     const btnSaveConfig = document.getElementById('btn-save-config');
 
     async function loadAdminData() {
@@ -286,6 +291,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const rooms = parseInt(aConfigRoomsSelect.value);
         const montage = aConfigMontageInput.value.trim();
         const lid = aConfigLidInput.value.trim();
+        const color = aConfigColorInput.value.trim();
         
         const wheels = document.getElementById('a-config-wheels').checked;
         const weight = document.getElementById('a-config-weight').checked;
@@ -309,6 +315,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             roomFractions: selectedFractions,
             montageItem: montage,
             lidItem: lid,
+            color: color,
             wheels: wheels,
             weight: weight,
             gas: gas
@@ -322,6 +329,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Ryd formen
         aConfigMontageInput.value = '';
         aConfigLidInput.value = '';
+        aConfigColorInput.value = '';
         document.getElementById('a-config-wheels').checked = false;
         document.getElementById('a-config-weight').checked = false;
         document.getElementById('a-config-gas').checked = false;
@@ -368,7 +376,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;"><strong>Tilvalg:</strong> ${optionsText}</div>
                         <div style="font-size: 0.85rem; margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px dashed #ccc;">
                             Montage: <span style="font-family:monospace;">${c.montageItem || '-'}</span> | 
-                            Låg: <span style="font-family:monospace;">${c.lidItem || '-'}</span>
+                            Låg: <span style="font-family:monospace;">${c.lidItem || '-'}</span> |
+                            Farve: <span>${c.color || 'Standard'}</span>
                         </div>
                     </div>
                     <div style="display: flex; gap: 0.5rem;">
@@ -420,6 +429,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 aConfigMontageInput.value = c.montageItem || '';
                 aConfigLidInput.value = c.lidItem || '';
+                aConfigColorInput.value = c.color || '';
                 
                 document.getElementById('a-config-wheels').checked = !!c.wheels;
                 document.getElementById('a-config-weight').checked = !!c.weight;

@@ -1,104 +1,95 @@
-// db.js
-// Dette modul håndterer al database-interaktion.
-// Lige nu bruger den localStorage, men fordi funktionerne er asynkrone (async/await),
-// kan de direkte udskiftes med Firebase kald uden at skulle ændre resten af appen.
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { getDatabase, ref, get, set, push, remove, child } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
 
-const DB_KEY_SIZES = 'bd_sizes';
-const DB_KEY_INLETS = 'bd_inlets';
-const DB_KEY_CONFIGS = 'bd_configs';
+const firebaseConfig = {
+    apiKey: "AIzaSyCEA2VB2mkcxJ9BE3cTUnXoGIXPm0UfToQ",
+    authDomain: "allsteel-bd-configurator.firebaseapp.com",
+    databaseURL: "https://allsteel-bd-configurator-default-rtdb.firebaseio.com",
+    projectId: "allsteel-bd-configurator",
+    storageBucket: "allsteel-bd-configurator.firebasestorage.app",
+    messagingSenderId: "622195142459",
+    appId: "1:622195142459:web:412271f4d541c6935a911e"
+};
 
-// --- Initialize default data if empty ---
-function initDefaults() {
-    if (!localStorage.getItem(DB_KEY_SIZES)) {
-        localStorage.setItem(DB_KEY_SIZES, JSON.stringify(["BD XL (69x35)", "BD XXL (85x35)", "BD2 L + XL (119x35)"]));
-    }
-    if (!localStorage.getItem(DB_KEY_INLETS)) {
-        localStorage.setItem(DB_KEY_INLETS, JSON.stringify([
-            { id: "302", name: "Figure Rest" },
-            { id: "303", name: "Figure Papir" },
-            { id: "304", name: "Figure Plast" },
-            { id: "301", name: "Figure Mad" },
-            { id: "310", name: "Figure Pant" },
-            { id: "317", name: "Rund 150 (Pant)" }
-        ]));
-    }
-    if (!localStorage.getItem(DB_KEY_CONFIGS)) {
-        localStorage.setItem(DB_KEY_CONFIGS, JSON.stringify([]));
-    }
-}
-initDefaults();
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
 // --- Sizes ---
 export async function getSizes() {
-    return JSON.parse(localStorage.getItem(DB_KEY_SIZES) || '[]');
+    const snapshot = await get(ref(db, 'sizes'));
+    const sizes = [];
+    if (snapshot.exists()) {
+        snapshot.forEach((childSnapshot) => {
+            sizes.push(childSnapshot.val().name);
+        });
+    }
+    return sizes.sort();
 }
 
 export async function addSize(sizeName) {
-    const sizes = await getSizes();
-    if (!sizes.includes(sizeName)) {
-        sizes.push(sizeName);
-        localStorage.setItem(DB_KEY_SIZES, JSON.stringify(sizes));
-    }
+    // Sanitér navnet lidt, da visse tegn (som '.', '#', '$', '[', or ']') ikke er tilladt i RTDB keys
+    const safeKey = sizeName.replace(/[.#$\[\]]/g, '_');
+    await set(ref(db, 'sizes/' + safeKey), { name: sizeName });
 }
 
 export async function deleteSize(sizeName) {
-    let sizes = await getSizes();
-    sizes = sizes.filter(s => s !== sizeName);
-    localStorage.setItem(DB_KEY_SIZES, JSON.stringify(sizes));
+    const safeKey = sizeName.replace(/[.#$\[\]]/g, '_');
+    await remove(ref(db, 'sizes/' + safeKey));
 }
 
 // --- Inlets ---
 export async function getInlets() {
-    return JSON.parse(localStorage.getItem(DB_KEY_INLETS) || '[]');
+    const snapshot = await get(ref(db, 'inlets'));
+    const inlets = [];
+    if (snapshot.exists()) {
+        snapshot.forEach((childSnapshot) => {
+            inlets.push(childSnapshot.val());
+        });
+    }
+    return inlets.sort((a, b) => a.id.localeCompare(b.id));
 }
 
 export async function addInlet(id, name) {
-    const inlets = await getInlets();
-    inlets.push({ id, name });
-    localStorage.setItem(DB_KEY_INLETS, JSON.stringify(inlets));
+    const safeKey = id.replace(/[.#$\[\]]/g, '_');
+    await set(ref(db, 'inlets/' + safeKey), { id, name });
 }
 
 export async function deleteInlet(inletId) {
-    let inlets = await getInlets();
-    inlets = inlets.filter(i => i.id !== inletId);
-    localStorage.setItem(DB_KEY_INLETS, JSON.stringify(inlets));
+    const safeKey = inletId.replace(/[.#$\[\]]/g, '_');
+    await remove(ref(db, 'inlets/' + safeKey));
 }
 
 // --- Configurations ---
 export async function getConfigs() {
-    return JSON.parse(localStorage.getItem(DB_KEY_CONFIGS) || '[]');
+    const snapshot = await get(ref(db, 'configs'));
+    const configs = [];
+    if (snapshot.exists()) {
+        snapshot.forEach((childSnapshot) => {
+            const data = childSnapshot.val();
+            data.id = childSnapshot.key;
+            configs.push(data);
+        });
+    }
+    return configs;
 }
 
 export async function addConfig(config) {
-    const configs = await getConfigs();
-    
     if (config.id) {
         // Updating existing
-        const index = configs.findIndex(c => c.id === config.id);
-        if (index >= 0) {
-            configs[index] = config;
-        } else {
-            configs.push(config);
-        }
+        await set(ref(db, 'configs/' + config.id), config);
     } else {
         // Creating new
-        config.id = Date.now().toString() + Math.random().toString(36).substring(2, 5);
-        configs.push(config);
+        const newRef = push(ref(db, 'configs'));
+        config.id = newRef.key;
+        await set(newRef, config);
     }
-    
-    localStorage.setItem(DB_KEY_CONFIGS, JSON.stringify(configs));
 }
 
 export async function deleteConfig(id) {
-    let configs = await getConfigs();
-    configs = configs.filter(c => c.id !== id);
-    localStorage.setItem(DB_KEY_CONFIGS, JSON.stringify(configs));
+    await remove(ref(db, 'configs/' + id));
 }
 
 export async function findConfigs(inletsArray) {
-    // inletsArray is an array of inlet IDs, e.g., ["302", "303", "310"]
     const configs = await getConfigs();
-    
-    // Returner ALLE configs der matcher
-    return configs.filter(c => JSON.stringify(c.inlets) === JSON.stringify(inletsArray));
+    return configs.filter(c => JSON.stringify(c.inlets || []) === JSON.stringify(inletsArray));
 }
