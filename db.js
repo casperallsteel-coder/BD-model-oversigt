@@ -89,7 +89,20 @@ export async function deleteConfig(id) {
     await remove(ref(db, 'configs/' + id));
 }
 
-export async function findConfigs(inletsArray) {
+export async function findConfigs(rooms, inletsArray) {
     const configs = await getConfigs();
-    return configs.filter(c => JSON.stringify(c.inlets || []) === JSON.stringify(inletsArray));
+    
+    return configs.filter(c => {
+        // Filtrer først på antal rum
+        if (parseInt(c.rooms) !== parseInt(rooms)) return false;
+        
+        // Tjek hvert indkast
+        for (let i = 0; i < inletsArray.length; i++) {
+            // Hvis der er valgt et indkast i søgningen, og det ikke matcher stellets indkast
+            if (inletsArray[i] !== "" && c.inlets[i] !== inletsArray[i]) {
+                return false;
+            }
+        }
+        return true;
+    });
 }

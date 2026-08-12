@@ -61,15 +61,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     uRoomsSelect.addEventListener('change', renderUserInletDropdowns);
 
     btnFindConfig.addEventListener('click', async () => {
+        const rooms = uRoomsSelect.value;
         const selects = document.querySelectorAll('.u-inlet-select');
         const selectedInlets = Array.from(selects).map(s => s.value);
-        
-        if (selectedInlets.some(v => v === '')) {
-            alert("Vælg venligst indkast til alle rum.");
-            return;
-        }
 
-        const matchedConfigs = await findConfigs(selectedInlets);
+        const matchedConfigs = await findConfigs(rooms, selectedInlets);
 
         if (matchedConfigs.length > 0) {
             let html = '';
