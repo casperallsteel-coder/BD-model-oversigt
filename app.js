@@ -71,11 +71,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             let html = '';
             
             matchedConfigs.forEach(config => {
-                const optionsText = [
+                let optionsText = [
                     `Hjul: ${config.wheels ? 'Ja' : 'Nej'}`,
                     `Vægtklods: ${config.weight ? 'Ja' : 'Nej'}`,
                     `Gasdæmper: ${config.gas ? 'Ja' : 'Nej'}`
                 ].join(', ');
+                if (config.other) {
+                    optionsText += `, Andet: ${config.other}`;
+                }
 
                 // Generate visual
                 let visualHtml = '';
@@ -172,6 +175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const aConfigMontageInput = document.getElementById('a-config-montage');
     const aConfigLidInput = document.getElementById('a-config-lid');
     const aConfigColorInput = document.getElementById('a-config-color');
+    const aConfigOtherInput = document.getElementById('a-config-other');
     const btnSaveConfig = document.getElementById('btn-save-config');
 
     async function loadAdminData() {
@@ -288,6 +292,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const montage = aConfigMontageInput.value.trim();
         const lid = aConfigLidInput.value.trim();
         const color = aConfigColorInput.value.trim();
+        const other = aConfigOtherInput.value.trim();
         
         const wheels = document.getElementById('a-config-wheels').checked;
         const weight = document.getElementById('a-config-weight').checked;
@@ -312,6 +317,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             montageItem: montage,
             lidItem: lid,
             color: color,
+            other: other,
             wheels: wheels,
             weight: weight,
             gas: gas
@@ -326,6 +332,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         aConfigMontageInput.value = '';
         aConfigLidInput.value = '';
         aConfigColorInput.value = '';
+        aConfigOtherInput.value = '';
         document.getElementById('a-config-wheels').checked = false;
         document.getElementById('a-config-weight').checked = false;
         document.getElementById('a-config-gas').checked = false;
@@ -361,6 +368,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (c.wheels) optionsArr.push('Hjul');
             if (c.weight) optionsArr.push('Vægtklods');
             if (c.gas) optionsArr.push('Gasdæmper');
+            if (c.other) optionsArr.push(`Andet: ${c.other}`);
             const optionsText = optionsArr.length > 0 ? optionsArr.join(', ') : 'Ingen';
 
             html += `
@@ -426,6 +434,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 aConfigMontageInput.value = c.montageItem || '';
                 aConfigLidInput.value = c.lidItem || '';
                 aConfigColorInput.value = c.color || '';
+                aConfigOtherInput.value = c.other || '';
                 
                 document.getElementById('a-config-wheels').checked = !!c.wheels;
                 document.getElementById('a-config-weight').checked = !!c.weight;
