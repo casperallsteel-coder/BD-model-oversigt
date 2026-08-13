@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     `Gasdæmper: ${config.gas ? 'Ja' : 'Nej'}`
                 ].join(', ');
                 if (config.other) {
-                    optionsText += `, Andet: ${config.other}`;
+                    optionsText += `<br><strong>Andet:</strong> ${config.other}`;
                 }
 
                 // Generate visual
@@ -368,8 +368,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (c.wheels) optionsArr.push('Hjul');
             if (c.weight) optionsArr.push('Vægtklods');
             if (c.gas) optionsArr.push('Gasdæmper');
-            if (c.other) optionsArr.push(`Andet: ${c.other}`);
-            const optionsText = optionsArr.length > 0 ? optionsArr.join(', ') : 'Ingen';
+            
+            let optionsText = optionsArr.length > 0 ? optionsArr.join(', ') : 'Ingen';
+            if (c.other) {
+                optionsText += `<br><strong>Andet:</strong> ${c.other}`;
+            }
 
             html += `
                 <div style="border: 1px solid var(--border-color); border-radius: 6px; padding: 1rem; display: flex; justify-content: space-between; align-items: center; background-color: var(--bg-color);">
