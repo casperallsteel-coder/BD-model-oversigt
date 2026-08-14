@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         ` : ''}
                         <div class="info-group">
                             <h3>Farve / Overflade</h3>
-                            <p style="font-size: 1.1rem;">${config.color || 'Standard'}</p>
+                            <p style="font-size: 1.1rem;">${config.color ? config.color : '<span style="color:var(--text-muted); font-style:italic;">Vælg farve...</span>'}</p>
                         </div>
                         <div class="info-group">
                             <h3>Tilvalg</h3>
