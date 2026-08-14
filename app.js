@@ -1,28 +1,6 @@
 import { getSizes, addSize, deleteSize, getInlets, addInlet, deleteInlet, getConfigs, addConfig, deleteConfig, findConfigs } from './db.js';
 
 const SVG_INLETS = {
-    // 301 Pear (Apple-like) - approximate
-    '301': `<path d="M 50 10 C 35 10 30 35 25 50 C 20 65 30 90 50 90 C 70 90 80 65 75 50 C 70 35 65 10 50 10 Z" fill="currentColor"/>`,
-    // 302 Bag - approximate
-    '302': `<path d="M 30 20 L 25 80 C 25 90 35 95 50 95 C 65 95 75 90 75 80 L 70 20 Z M 45 10 L 55 10 L 55 20 L 45 20 Z" fill="currentColor"/>`,
-    // 303 Paper
-    '303': `<rect x="25" y="20" width="50" height="60" fill="currentColor"/><line x1="30" y1="30" x2="70" y2="30" stroke="white" stroke-width="3"/><line x1="30" y1="40" x2="70" y2="40" stroke="white" stroke-width="3"/>`,
-    // 304 Milk carton
-    '304': `<rect x="30" y="30" width="40" height="55" fill="currentColor"/><polygon points="30,30 50,15 70,30" fill="currentColor"/>`,
-    // 305 Bottle
-    '305': `<rect x="35" y="40" width="30" height="50" rx="5" fill="currentColor"/><rect x="42" y="10" width="16" height="30" fill="currentColor"/>`,
-    // 306 Small carton
-    '306': `<rect x="35" y="35" width="30" height="45" fill="currentColor"/><polygon points="35,35 50,25 65,35" fill="currentColor"/>`,
-    // 307 Wine bottle
-    '307': `<path d="M 45 10 L 55 10 L 55 35 L 65 50 L 65 90 L 35 90 L 35 50 L 45 35 Z" fill="currentColor"/>`,
-    // 308 Can
-    '308': `<rect x="35" y="25" width="30" height="50" rx="4" fill="currentColor"/>`,
-    // 309 Carton with open lid
-    '309': `<rect x="30" y="40" width="40" height="40" fill="currentColor"/><polygon points="30,40 50,20 70,40" fill="currentColor"/>`,
-    // 310 Plastic bottle
-    '310': `<path d="M 45 15 L 55 15 L 55 25 C 65 25 65 35 65 40 L 65 85 L 35 85 L 35 40 C 35 35 35 25 45 25 Z" fill="currentColor"/>`,
-    // 311 Cup
-    '311': `<circle cx="50" cy="50" r="25" fill="currentColor"/><circle cx="50" cy="50" r="10" fill="white"/>`,
     // 312 Diamond
     '312': `<polygon points="50,15 85,50 50,85 15,50" fill="currentColor"/>`,
     // 313 Rectangle
