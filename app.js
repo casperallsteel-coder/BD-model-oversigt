@@ -36,6 +36,12 @@ const SVG_INLETS = {
     // Special: Rektangel 210x110 (Samme form som 313)
     'Rektangel 210x110': `<rect x="25" y="15" width="50" height="70" fill="currentColor"/>`,
     'Rektangel 210×110': `<rect x="25" y="15" width="50" height="70" fill="currentColor"/>`,
+    // Special: Kvadrat 190x190 (Samme form som 318)
+    'Kvadrat 190x190': `<rect x="20" y="20" width="60" height="60" fill="currentColor"/>`,
+    'Kvadrat 190×190': `<rect x="20" y="20" width="60" height="60" fill="currentColor"/>`,
+    // Special: Rektangel 310x190 (Samme form som 313, roteret 90 grader)
+    'Rektangel 310x190': `<rect x="15" y="25" width="70" height="50" fill="currentColor"/>`,
+    'Rektangel 310×190': `<rect x="15" y="25" width="70" height="50" fill="currentColor"/>`,
     // Special: Rombe H200 (Samme form som 312)
     'Rombe H200': `<polygon points="50,15 85,50 50,85 15,50" fill="currentColor"/>`,
     // Special: Oval H200 (Samme form som 316)
