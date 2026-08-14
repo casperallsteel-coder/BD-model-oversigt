@@ -127,9 +127,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <p style="font-family: monospace; font-size: 1.2rem;">${config.montageItem || '-'}</p>
                         </div>
                         <div class="info-group">
-                            <h3>Låg Varenummer</h3>
+                            <h3>Låg 1 Varenummer</h3>
                             <p style="font-family: monospace; font-size: 1.2rem;">${config.lidItem || '-'}</p>
                         </div>
+                        ${config.lidItem2 ? `
+                        <div class="info-group">
+                            <h3>Låg 2 Varenummer</h3>
+                            <p style="font-family: monospace; font-size: 1.2rem;">${config.lidItem2}</p>
+                        </div>
+                        ` : ''}
                         <div class="info-group">
                             <h3>Farve / Overflade</h3>
                             <p style="font-size: 1.1rem;">${config.color || 'Standard'}</p>
@@ -174,6 +180,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const aConfigInletsContainer = document.getElementById('a-config-inlets-container');
     const aConfigMontageInput = document.getElementById('a-config-montage');
     const aConfigLidInput = document.getElementById('a-config-lid');
+    const aConfigLid2Input = document.getElementById('a-config-lid-2');
     const aConfigColorInput = document.getElementById('a-config-color');
     const aConfigOtherInput = document.getElementById('a-config-other');
     const btnSaveConfig = document.getElementById('btn-save-config');
@@ -291,6 +298,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const rooms = parseInt(aConfigRoomsSelect.value);
         const montage = aConfigMontageInput.value.trim();
         const lid = aConfigLidInput.value.trim();
+        const lid2 = aConfigLid2Input.value.trim();
         const color = aConfigColorInput.value.trim();
         const other = aConfigOtherInput.value.trim();
         
@@ -306,7 +314,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!size) return alert("Vælg stel størrelse");
         if (selectedInlets.some(v => v === '')) return alert("Vælg indkast til alle rum");
-        if (!montage || !lid) return alert("Angiv både montage og låg varenummer");
+        if (!montage || !lid) return alert("Angiv i det mindste montage og låg 1 varenummer");
 
         const config = {
             id: currentEditId,
@@ -316,6 +324,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             roomFractions: selectedFractions,
             montageItem: montage,
             lidItem: lid,
+            lidItem2: lid2,
             color: color,
             other: other,
             wheels: wheels,
@@ -331,6 +340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Ryd formen
         aConfigMontageInput.value = '';
         aConfigLidInput.value = '';
+        aConfigLid2Input.value = '';
         aConfigColorInput.value = '';
         aConfigOtherInput.value = '';
         document.getElementById('a-config-wheels').checked = false;
@@ -383,7 +393,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;"><strong>Tilvalg:</strong> ${optionsText}</div>
                         <div style="font-size: 0.85rem; margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px dashed #ccc;">
                             Montage: <span style="font-family:monospace;">${c.montageItem || '-'}</span> | 
-                            Låg: <span style="font-family:monospace;">${c.lidItem || '-'}</span> |
+                            Låg 1: <span style="font-family:monospace;">${c.lidItem || '-'}</span>
+                            ${c.lidItem2 ? ` | Låg 2: <span style="font-family:monospace;">${c.lidItem2}</span>` : ''} |
                             Farve: <span>${c.color || 'Standard'}</span>
                         </div>
                     </div>
@@ -436,6 +447,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 aConfigMontageInput.value = c.montageItem || '';
                 aConfigLidInput.value = c.lidItem || '';
+                aConfigLid2Input.value = c.lidItem2 || '';
                 aConfigColorInput.value = c.color || '';
                 aConfigOtherInput.value = c.other || '';
                 
