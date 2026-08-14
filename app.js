@@ -36,6 +36,9 @@ const SVG_INLETS = {
     // Special: Rektangel 210x110 (Samme form som 313)
     'Rektangel 210x110': `<rect x="25" y="15" width="50" height="70" fill="currentColor"/>`,
     'Rektangel 210×110': `<rect x="25" y="15" width="50" height="70" fill="currentColor"/>`,
+    // Special: Rektangel 150x100 (Samme form som 313)
+    'Rektangel 150x100': `<rect x="25" y="15" width="50" height="70" fill="currentColor"/>`,
+    'Rektangel 150×100': `<rect x="25" y="15" width="50" height="70" fill="currentColor"/>`,
     // Special: Kvadrat 190x190 (Samme form som 318)
     'Kvadrat 190x190': `<rect x="20" y="20" width="60" height="60" fill="currentColor"/>`,
     'Kvadrat 190×190': `<rect x="20" y="20" width="60" height="60" fill="currentColor"/>`,
