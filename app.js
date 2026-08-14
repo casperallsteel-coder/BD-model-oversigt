@@ -27,6 +27,8 @@ const SVG_INLETS = {
     'Rektangle 210x150': `<rect x="20" y="25" width="60" height="50" fill="currentColor"/>`,
     // Special: Trekant H130
     'Trekant H130': `<polygon points="50,15 15,80 85,80" fill="currentColor"/>`,
+    // Special: Rektangel 250x110
+    'Rektangel 250x110': `<rect x="30" y="15" width="40" height="70" fill="currentColor"/>`,
     // Default fallback (just a dashed circle)
     'default': `<circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="6,6"/>`
 };
