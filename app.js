@@ -5,7 +5,10 @@ const IMAGE_INLETS = {
     '306': 'img/306.png', '307': 'img/307.png', '308': 'img/308.png', '309': 'img/309.png', '310': 'img/310.png', '311': 'img/311.png',
     // 400-serien genbruger 300-seriens billeder
     '401': 'img/301.png', '402': 'img/302.png', '403': 'img/303.png', '404': 'img/304.png', '405': 'img/305.png',
-    '406': 'img/306.png', '407': 'img/307.png', '408': 'img/308.png', '409': 'img/309.png', '410': 'img/310.png'
+    '406': 'img/306.png', '407': 'img/307.png', '408': 'img/308.png', '409': 'img/309.png', '410': 'img/310.png',
+    // Special
+    'Pizza': 'img/Pizza.png',
+    'pizza': 'img/Pizza.png'
 };
 
 const SVG_INLETS = {
