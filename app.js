@@ -45,6 +45,9 @@ const SVG_INLETS = {
     // Special: Rektangel 220x120 (Samme form som 313)
     'Rektangel 220x120': `<rect x="25" y="15" width="50" height="70" fill="currentColor"/>`,
     'Rektangel 220×120': `<rect x="25" y="15" width="50" height="70" fill="currentColor"/>`,
+    // Special: Pant Mempran (317 cirkel med et plus i midten)
+    'Pant Mempran': `<circle cx="50" cy="50" r="35" fill="currentColor"/><line x1="50" y1="25" x2="50" y2="75" stroke="white" stroke-width="4"/><line x1="25" y1="50" x2="75" y2="50" stroke="white" stroke-width="4"/>`,
+    'Pant Membran': `<circle cx="50" cy="50" r="35" fill="currentColor"/><line x1="50" y1="25" x2="50" y2="75" stroke="white" stroke-width="4"/><line x1="25" y1="50" x2="75" y2="50" stroke="white" stroke-width="4"/>`,
     // Special: Rombe H220 (Samme form som 312)
     'Rombe H220': `<polygon points="50,15 85,50 50,85 15,50" fill="currentColor"/>`,
     // Special: Oval H220 (Samme form som 316)
