@@ -49,6 +49,11 @@ const SVG_INLETS = {
     'Rombe H220': `<polygon points="50,15 85,50 50,85 15,50" fill="currentColor"/>`,
     // Special: Oval H220 (Samme form som 316)
     'Oval H220': `<ellipse cx="50" cy="50" rx="25" ry="40" fill="currentColor"/>`,
+    // Låg på Låget (Åben / Lukket)
+    'Åben': `<rect x="15" y="15" width="70" height="70" fill="currentColor"/>`,
+    'åben': `<rect x="15" y="15" width="70" height="70" fill="currentColor"/>`,
+    'Lukket': `<rect x="10" y="10" width="80" height="80" fill="#cbd5e1" stroke="currentColor" stroke-width="3"/><rect x="40" y="75" width="20" height="6" fill="currentColor"/>`,
+    'lukket': `<rect x="10" y="10" width="80" height="80" fill="#cbd5e1" stroke="currentColor" stroke-width="3"/><rect x="40" y="75" width="20" height="6" fill="currentColor"/>`,
     // Special: Kvadrat 190x190 (Samme form som 318)
     'Kvadrat 190x190': `<rect x="20" y="20" width="60" height="60" fill="currentColor"/>`,
     'Kvadrat 190×190': `<rect x="20" y="20" width="60" height="60" fill="currentColor"/>`,
