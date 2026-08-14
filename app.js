@@ -1,5 +1,13 @@
 import { getSizes, addSize, deleteSize, getInlets, addInlet, deleteInlet, getConfigs, addConfig, deleteConfig, findConfigs } from './db.js';
 
+const IMAGE_INLETS = {
+    '301': 'img/301.png', '302': 'img/302.png', '303': 'img/303.png', '304': 'img/304.png', '305': 'img/305.png',
+    '306': 'img/306.png', '307': 'img/307.png', '308': 'img/308.png', '309': 'img/309.png', '310': 'img/310.png', '311': 'img/311.png',
+    // 400-serien genbruger 300-seriens billeder
+    '401': 'img/301.png', '402': 'img/302.png', '403': 'img/303.png', '404': 'img/304.png', '405': 'img/305.png',
+    '406': 'img/306.png', '407': 'img/307.png', '408': 'img/308.png', '409': 'img/309.png', '410': 'img/310.png'
+};
+
 const SVG_INLETS = {
     // 312 Diamond
     '312': `<polygon points="50,15 85,50 50,85 15,50" fill="currentColor"/>`,
@@ -126,13 +134,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const borderRight = (i === config.rooms - 1) ? 'none' : '2px solid var(--text-main)';
                     const bgCol = (i % 2 === 0) ? '#ffffff' : '#f9fafb';
                     
-                    const svgShape = SVG_INLETS[inletId] || SVG_INLETS['default'];
+                    let shapeHtml = '';
+                    if (IMAGE_INLETS[inletId]) {
+                        shapeHtml = `<img src="${IMAGE_INLETS[inletId]}" style="width: 45px; height: 45px; object-fit: contain; margin-bottom: 0.2rem;" alt="${inletId}">`;
+                    } else {
+                        const svgShape = SVG_INLETS[inletId] || SVG_INLETS['default'];
+                        shapeHtml = `
+                            <svg viewBox="0 0 100 100" style="width: 45px; height: 45px; color: #222222; margin-bottom: 0.2rem;">
+                                ${svgShape}
+                            </svg>`;
+                    }
                     
                     visualHtml += `
                         <div style="width: ${widthPercent}%; border-right: ${borderRight}; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: ${bgCol}; position: relative;">
-                            <svg viewBox="0 0 100 100" style="width: 45px; height: 45px; color: #222222; margin-bottom: 0.2rem;">
-                                ${svgShape}
-                            </svg>
+                            ${shapeHtml}
                             <span style="font-weight:700; color:var(--primary-color); font-size:0.9rem;">${inletId}</span>
                             <span style="font-size:0.7rem; color:var(--text-muted);">${fractionStr}</span>
                         </div>
