@@ -1,4 +1,31 @@
-import { getSizes, addSize, deleteSize, getInlets, addInlet, deleteInlet, addConfig, findConfigs, getConfigs, deleteConfig } from './db.js';
+import { getSizes, addSize, deleteSize, getInlets, addInlet, deleteInlet, getConfigs, addConfig, deleteConfig, findConfigs } from './db.js';
+
+const SVG_INLETS = {
+    // 301 Pear (Apple-like) - approximate
+    '301': `<path d="M 50 10 C 35 10 30 35 25 50 C 20 65 30 90 50 90 C 70 90 80 65 75 50 C 70 35 65 10 50 10 Z" fill="currentColor"/>`,
+    // 302 Bag - approximate
+    '302': `<path d="M 30 20 L 25 80 C 25 90 35 95 50 95 C 65 95 75 90 75 80 L 70 20 Z M 45 10 L 55 10 L 55 20 L 45 20 Z" fill="currentColor"/>`,
+    // 304 Milk carton
+    '304': `<rect x="30" y="30" width="40" height="55" fill="currentColor"/><polygon points="30,30 50,15 70,30" fill="currentColor"/>`,
+    // 305 Bottle
+    '305': `<rect x="35" y="40" width="30" height="50" rx="5" fill="currentColor"/><rect x="42" y="10" width="16" height="30" fill="currentColor"/>`,
+    // 312 Diamond
+    '312': `<polygon points="50,15 85,50 50,85 15,50" fill="currentColor"/>`,
+    // 313 Rectangle
+    '313': `<rect x="25" y="15" width="50" height="70" fill="currentColor"/>`,
+    // 314 Slot (narrow)
+    '314': `<rect x="40" y="10" width="20" height="80" rx="3" fill="currentColor"/>`,
+    // 316 Oval
+    '316': `<ellipse cx="50" cy="50" rx="25" ry="40" fill="currentColor"/>`,
+    // 317 Circle
+    '317': `<circle cx="50" cy="50" r="35" fill="currentColor"/>`,
+    // 318 Square
+    '318': `<rect x="20" y="20" width="60" height="60" fill="currentColor"/>`,
+    // 319 Hexagon
+    '319': `<polygon points="50,15 80,32 80,68 50,85 20,68 20,32" fill="currentColor"/>`,
+    // Default fallback (just a dashed circle)
+    'default': `<circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="6,6"/>`
+};
 
 document.addEventListener('DOMContentLoaded', async () => {
     // === Navigation ===
@@ -97,10 +124,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const borderRight = (i === config.rooms - 1) ? 'none' : '2px solid var(--text-main)';
                     const bgCol = (i % 2 === 0) ? '#ffffff' : '#f9fafb';
                     
+                    const svgShape = SVG_INLETS[inletId] || SVG_INLETS['default'];
+                    
                     visualHtml += `
-                        <div style="width: ${widthPercent}%; border-right: ${borderRight}; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: ${bgCol};">
-                            <span style="font-weight:700; color:var(--primary-color); font-size:1.1rem;">${inletId}</span>
-                            <span style="font-size:0.8rem; color:var(--text-muted);">${fractionStr}</span>
+                        <div style="width: ${widthPercent}%; border-right: ${borderRight}; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: ${bgCol}; position: relative;">
+                            <svg viewBox="0 0 100 100" style="width: 45px; height: 45px; color: #222222; margin-bottom: 0.2rem;">
+                                ${svgShape}
+                            </svg>
+                            <span style="font-weight:700; color:var(--primary-color); font-size:0.9rem;">${inletId}</span>
+                            <span style="font-size:0.7rem; color:var(--text-muted);">${fractionStr}</span>
                         </div>
                     `;
                 }
