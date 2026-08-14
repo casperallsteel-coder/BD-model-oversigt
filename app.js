@@ -1,4 +1,4 @@
-import { getSizes, addSize, deleteSize, getInlets, addInlet, deleteInlet, getConfigs, addConfig, deleteConfig, findConfigs } from './db.js';
+import { getSizes, addSize, deleteSize, getInlets, addInlet, deleteInlet, getConfigs, addConfig, deleteConfig, findConfigs, auth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from './db.js';
 
 const IMAGE_INLETS = {
     '301': 'img/301.png', '302': 'img/302.png', '303': 'img/303.png', '304': 'img/304.png', '305': 'img/305.png',
@@ -97,12 +97,66 @@ document.addEventListener('DOMContentLoaded', async () => {
             btnNavAdmin.style.fontWeight = '600';
             btnNavUser.style.color = '#9ca3af';
             btnNavUser.style.fontWeight = '500';
-            loadAdminData(); // Refresh dropdowns
+            if (auth.currentUser) {
+                loadAdminData(); // Refresh dropdowns if logged in
+            }
         }
     }
 
     btnNavUser.addEventListener('click', () => switchView('user'));
     btnNavAdmin.addEventListener('click', () => switchView('admin'));
+
+    // === Auth Logic ===
+    const btnLogin = document.getElementById('btn-login');
+    const btnLogout = document.getElementById('btn-logout');
+    const loginEmail = document.getElementById('login-email');
+    const loginPassword = document.getElementById('login-password');
+    const loginError = document.getElementById('login-error');
+    const adminLoginContainer = document.getElementById('admin-login-container');
+    const adminContentContainer = document.getElementById('admin-content-container');
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            adminLoginContainer.style.display = 'none';
+            adminContentContainer.style.display = 'block';
+            btnLogout.style.display = 'block';
+            if (viewAdmin.classList.contains('active')) {
+                loadAdminData();
+            }
+        } else {
+            adminLoginContainer.style.display = 'block';
+            adminContentContainer.style.display = 'none';
+            btnLogout.style.display = 'none';
+        }
+    });
+
+    btnLogin.addEventListener('click', async () => {
+        const email = loginEmail.value.trim();
+        const password = loginPassword.value;
+        if (!email || !password) {
+            loginError.textContent = "Indtast venligst e-mail og adgangskode.";
+            loginError.style.display = 'block';
+            return;
+        }
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            loginError.style.display = 'none';
+            loginEmail.value = '';
+            loginPassword.value = '';
+        } catch (error) {
+            console.error("Login fejl:", error);
+            loginError.textContent = "Forkert e-mail eller adgangskode.";
+            loginError.style.display = 'block';
+        }
+    });
+
+    btnLogout.addEventListener('click', async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error("Logud fejl:", error);
+        }
+    });
 
     // === User View Logic ===
     const uRoomsSelect = document.getElementById('u-rooms');

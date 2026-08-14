@@ -70,9 +70,27 @@
         <section id="view-admin" class="view">
             <div class="header-action">
                 <h1>Konfigurator (Databasestyring)</h1>
+                <button id="btn-logout" class="secondary-button" style="display: none;">Log Ud</button>
             </div>
             
-            <div class="detail-grid">
+            <!-- Login Boks -->
+            <div id="admin-login-container" style="max-width: 400px; margin: 4rem auto; padding: 2rem; border: 1px solid var(--border-color); border-radius: 8px; background-color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                <h2 style="margin-bottom: 1.5rem; text-align: center;">Log ind for adgang</h2>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" id="login-email" placeholder="Din e-mail" style="width: 100%; padding: 0.75rem;">
+                </div>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label>Adgangskode</label>
+                    <input type="password" id="login-password" placeholder="Din adgangskode" style="width: 100%; padding: 0.75rem;">
+                </div>
+                <button id="btn-login" class="primary-button w-full" style="padding: 0.75rem; font-size: 1.1rem;">Log Ind</button>
+                <div id="login-error" style="color: red; margin-top: 1rem; text-align: center; display: none;"></div>
+            </div>
+
+            <!-- Admin Indhold (skjult som standard) -->
+            <div id="admin-content-container" style="display: none;">
+                <div class="detail-grid">
                 <!-- Administrer Grunddata -->
                 <div class="card-form" style="padding: 1.5rem;">
                     <h2 style="margin-bottom: 1rem; color: var(--text-main);">Administrer Grunddata</h2>
@@ -209,6 +227,7 @@
                     <!-- Liste genereret fra JS -->
                 </div>
             </div>
+            </div> <!-- End admin-content-container -->
         </section>
     </main>
 

@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
 import { getDatabase, ref, get, set, push, remove, child } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCEA2VB2mkcxJ9BE3cTUnXoGIXPm0UfToQ",
@@ -13,6 +14,9 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth(app);
+
+export { auth, signInWithEmailAndPassword, signOut, onAuthStateChanged };
 
 // --- Sizes ---
 export async function getSizes() {
