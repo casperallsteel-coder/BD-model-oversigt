@@ -33,6 +33,13 @@ const SVG_INLETS = {
     // Special: Rektangel 250x110
     'Rektangel 250x110': `<rect x="30" y="15" width="40" height="70" fill="currentColor"/>`,
     'Rektangel 250×110': `<rect x="30" y="15" width="40" height="70" fill="currentColor"/>`,
+    // Special: Rektangel 210x110 (Samme form som 313)
+    'Rektangel 210x110': `<rect x="25" y="15" width="50" height="70" fill="currentColor"/>`,
+    'Rektangel 210×110': `<rect x="25" y="15" width="50" height="70" fill="currentColor"/>`,
+    // Special: Rombe H200 (Samme form som 312)
+    'Rombe H200': `<polygon points="50,15 85,50 50,85 15,50" fill="currentColor"/>`,
+    // Special: Oval H200 (Samme form som 316)
+    'Oval H200': `<ellipse cx="50" cy="50" rx="25" ry="40" fill="currentColor"/>`,
     // Default fallback (just a dashed circle)
     'default': `<circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="6,6"/>`
 };
