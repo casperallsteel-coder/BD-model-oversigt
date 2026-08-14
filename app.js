@@ -28,6 +28,10 @@ const SVG_INLETS = {
     '318': `<rect x="20" y="20" width="60" height="60" fill="currentColor"/>`,
     // 319 Hexagon
     '319': `<polygon points="50,15 80,32 80,68 50,85 20,68 20,32" fill="currentColor"/>`,
+    // 320 Large Circle
+    '320': `<circle cx="50" cy="50" r="42" fill="currentColor"/>`,
+    // 321 Large Square
+    '321': `<rect x="10" y="10" width="80" height="80" fill="currentColor"/>`,
     // Special: Rektangel 210x150
     'Rektangel 210x150': `<rect x="20" y="25" width="60" height="50" fill="currentColor"/>`,
     'Rektangel 210×150': `<rect x="20" y="25" width="60" height="50" fill="currentColor"/>`,
