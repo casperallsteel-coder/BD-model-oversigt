@@ -274,6 +274,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         aConfigSizeSelect.innerHTML = `<option value="">-- Vælg Størrelse --</option>` + sizeOptions;
         
+        const filterSizeSelect = document.getElementById('a-filter-size');
+        if (filterSizeSelect) {
+            filterSizeSelect.innerHTML = `<option value="">Alle Størrelser</option>` + sizeOptions;
+        }
+        
         const deleteSizeSelect = document.getElementById('a-delete-size-select');
         if (deleteSizeSelect) {
             deleteSizeSelect.innerHTML = `<option value="">-- Vælg for at slette --</option>` + sizeOptions;
@@ -370,9 +375,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let currentEditId = null;
     let configSearchTerm = '';
+    let configFilterSize = '';
+    let configFilterRooms = '';
     
     document.getElementById('a-search-configs').addEventListener('input', (e) => {
         configSearchTerm = e.target.value.toLowerCase();
+        renderConfigsList();
+    });
+
+    document.getElementById('a-filter-size').addEventListener('change', (e) => {
+        configFilterSize = e.target.value;
+        renderConfigsList();
+    });
+    
+    document.getElementById('a-filter-rooms').addEventListener('change', (e) => {
+        configFilterRooms = e.target.value;
         renderConfigsList();
     });
 
@@ -440,6 +457,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const configs = await getConfigs();
         
         const filteredConfigs = configs.filter(c => {
+            if (configFilterSize && c.size !== configFilterSize) return false;
+            if (configFilterRooms && c.rooms.toString() !== configFilterRooms) return false;
+            
             if (!configSearchTerm) return true;
             return c.size.toLowerCase().includes(configSearchTerm) ||
                    (c.montageItem && c.montageItem.toLowerCase().includes(configSearchTerm)) ||

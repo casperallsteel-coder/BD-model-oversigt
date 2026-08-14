@@ -183,7 +183,28 @@
             <!-- Liste over gemte konfigurationer -->
             <div class="card-form" style="margin-top: 2rem;">
                 <h2 style="margin-bottom: 1rem; color: var(--text-main);">Gemte BD Stationer</h2>
-                <input type="text" id="a-search-configs" placeholder="Søg på størrelse, varenummer eller indkast..." style="margin-bottom: 1.5rem; padding: 0.75rem; width: 100%; border: 1px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
+                
+                <div class="form-row" style="margin-bottom: 1rem;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Filtrér på størrelse</label>
+                        <select id="a-filter-size">
+                            <option value="">Alle Størrelser</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Filtrér på antal rum</label>
+                        <select id="a-filter-rooms">
+                            <option value="">Alle Antal Rum</option>
+                            <option value="1">1 rum</option>
+                            <option value="2">2 rum</option>
+                            <option value="3">3 rum</option>
+                            <option value="4">4 rum</option>
+                        </select>
+                    </div>
+                </div>
+
+                <input type="text" id="a-search-configs" placeholder="Søg på varenummer, indkast, etc..." style="margin-bottom: 1.5rem; padding: 0.75rem; width: 100%; border: 1px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
+                
                 <div id="a-configs-list-container" style="display: flex; flex-direction: column; gap: 1rem;">
                     <!-- Liste genereret fra JS -->
                 </div>
