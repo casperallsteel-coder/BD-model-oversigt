@@ -136,11 +136,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     
                     let shapeHtml = '';
                     if (IMAGE_INLETS[inletId]) {
-                        shapeHtml = `<img src="${IMAGE_INLETS[inletId]}" style="width: 45px; height: 45px; object-fit: contain; margin-bottom: 0.2rem;" alt="${inletId}">`;
+                        shapeHtml = `<img src="${IMAGE_INLETS[inletId]}" style="width: 65px; height: 65px; object-fit: contain; margin-bottom: 0.5rem; margin-top: 0.5rem;" alt="${inletId}">`;
                     } else {
                         const svgShape = SVG_INLETS[inletId] || SVG_INLETS['default'];
                         shapeHtml = `
-                            <svg viewBox="0 0 100 100" style="width: 45px; height: 45px; color: #222222; margin-bottom: 0.2rem;">
+                            <svg viewBox="0 0 100 100" style="width: 65px; height: 65px; color: #222222; margin-bottom: 0.5rem; margin-top: 0.5rem;">
                                 ${svgShape}
                             </svg>`;
                     }
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="card-form" style="margin-bottom: 2rem; border-color: var(--primary-color); border-width: 2px;">
                     <h2 style="color: var(--primary-color); margin-bottom: 1rem;">Fundet Løsning</h2>
                     
-                    <div style="display: flex; width: 100%; height: 80px; border: 2px solid var(--text-main); border-radius: 8px; margin-bottom: 2rem; overflow: hidden; background-color: var(--bg-color);">
+                    <div style="display: flex; width: 100%; height: 130px; border: 2px solid var(--text-main); border-radius: 8px; margin-bottom: 2rem; overflow: hidden; background-color: var(--bg-color);">
                         ${visualHtml}
                     </div>
 
