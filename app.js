@@ -8,7 +8,9 @@ const IMAGE_INLETS = {
     '406': 'img/306.png', '407': 'img/307.png', '408': 'img/308.png', '409': 'img/309.png', '410': 'img/310.png',
     // Special
     'Pizza': 'img/Pizza.png',
-    'pizza': 'img/Pizza.png'
+    'pizza': 'img/Pizza.png',
+    'Figurer Mad _Old': 'img/Figurer Mad _Old.png',
+    'figurer mad _old': 'img/Figurer Mad _Old.png'
 };
 
 const SVG_INLETS = {
