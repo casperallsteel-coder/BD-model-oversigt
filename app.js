@@ -197,12 +197,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const selectedInlets = Array.from(selects).map(s => s.value);
         
         const filterSize = document.getElementById('u-filter-size').value;
+        const filterNone = document.getElementById('u-filter-none').checked;
         const filterWheels = document.getElementById('u-filter-wheels').checked;
         const filterWeight = document.getElementById('u-filter-weight').checked;
         const filterGas = document.getElementById('u-filter-gas').checked;
 
         const filters = {
             size: filterSize,
+            none: filterNone,
             wheels: filterWheels,
             weight: filterWeight,
             gas: filterGas

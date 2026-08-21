@@ -110,9 +110,16 @@ export async function findConfigs(rooms, inletsArray, filters = {}) {
         
         // Avancerede filtre
         if (filters.size && c.size !== filters.size) return false;
-        if (filters.wheels && !c.wheels) return false;
-        if (filters.weight && !c.weight) return false;
-        if (filters.gas && !c.gas) return false;
+        
+        if (filters.none) {
+            // "Uden tilvalg" krydset af -> Afvis stationer der HAR nogle tilvalg
+            if (c.wheels || c.weight || c.gas) return false;
+        } else {
+            // Almindelige filtre (viser kun stationer der OGSÅ har disse)
+            if (filters.wheels && !c.wheels) return false;
+            if (filters.weight && !c.weight) return false;
+            if (filters.gas && !c.gas) return false;
+        }
         
         return true;
     });
