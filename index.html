@@ -48,7 +48,28 @@
                     <!-- Dropdowns for each room generated via JS -->
                 </div>
 
-                <div class="form-actions" style="margin-top: 2rem;">
+                <div class="form-section-title" style="margin-top: 2rem;">Avancerede filtre (Valgfrit)</div>
+                <div class="form-row" style="margin-bottom: 1rem;">
+                    <div class="form-group" style="flex: 1; max-width: 300px;">
+                        <label for="u-filter-size">Stel Størrelse</label>
+                        <select id="u-filter-size">
+                            <option value="">Alle Størrelser</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row" style="margin-bottom: 1.5rem;">
+                    <label style="display:flex; align-items:center; gap:0.5rem; font-weight:normal; cursor:pointer;">
+                        <input type="checkbox" id="u-filter-wheels" style="width: auto; margin:0;"> Hjul
+                    </label>
+                    <label style="display:flex; align-items:center; gap:0.5rem; font-weight:normal; cursor:pointer;">
+                        <input type="checkbox" id="u-filter-weight" style="width: auto; margin:0;"> Vægtklods
+                    </label>
+                    <label style="display:flex; align-items:center; gap:0.5rem; font-weight:normal; cursor:pointer;">
+                        <input type="checkbox" id="u-filter-gas" style="width: auto; margin:0;"> Gasdæmper
+                    </label>
+                </div>
+
+                <div class="form-actions" style="margin-top: 1rem;">
                     <button id="btn-find-config" class="primary-button w-full" style="font-size: 1.2rem; padding: 1rem;">Søg Løsning</button>
                 </div>
             </div>

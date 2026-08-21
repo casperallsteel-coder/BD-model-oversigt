@@ -93,7 +93,7 @@ export async function deleteConfig(id) {
     await remove(ref(db, 'configs/' + id));
 }
 
-export async function findConfigs(rooms, inletsArray) {
+export async function findConfigs(rooms, inletsArray, filters = {}) {
     const configs = await getConfigs();
     
     return configs.filter(c => {
@@ -107,6 +107,13 @@ export async function findConfigs(rooms, inletsArray) {
                 return false;
             }
         }
+        
+        // Avancerede filtre
+        if (filters.size && c.size !== filters.size) return false;
+        if (filters.wheels && !c.wheels) return false;
+        if (filters.weight && !c.weight) return false;
+        if (filters.gas && !c.gas) return false;
+        
         return true;
     });
 }

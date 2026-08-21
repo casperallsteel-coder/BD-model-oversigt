@@ -195,8 +195,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         const rooms = uRoomsSelect.value;
         const selects = document.querySelectorAll('.u-inlet-select');
         const selectedInlets = Array.from(selects).map(s => s.value);
+        
+        const filterSize = document.getElementById('u-filter-size').value;
+        const filterWheels = document.getElementById('u-filter-wheels').checked;
+        const filterWeight = document.getElementById('u-filter-weight').checked;
+        const filterGas = document.getElementById('u-filter-gas').checked;
 
-        const matchedConfigs = await findConfigs(rooms, selectedInlets);
+        const filters = {
+            size: filterSize,
+            wheels: filterWheels,
+            weight: filterWeight,
+            gas: filterGas
+        };
+
+        const matchedConfigs = await findConfigs(rooms, selectedInlets, filters);
 
         if (matchedConfigs.length > 0) {
             let html = '';
@@ -624,5 +636,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Init User view
-    renderUserInletDropdowns();
+    async function initUserView() {
+        const sizes = await getSizes();
+        const uFilterSize = document.getElementById('u-filter-size');
+        if (uFilterSize) {
+            uFilterSize.innerHTML = `<option value="">Alle Størrelser</option>` + sizes.map(s => `<option value="${s}">${s}</option>`).join('');
+        }
+        await renderUserInletDropdowns();
+    }
+    initUserView();
 });
