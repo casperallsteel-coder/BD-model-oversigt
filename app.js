@@ -371,8 +371,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </div>
                         ` : ''}
                         <div class="info-group">
-                            <h3>Farve / Overflade</h3>
-                            <p style="font-size: 1.1rem;">${config.color ? config.color : '<span style="color:var(--text-muted); font-style:italic;">Vælg farve...</span>'}</p>
+                            <h3>Overflade</h3>
+                            <p style="font-size: 1.1rem;">${config.color ? config.color : '<span style="color:var(--text-muted); font-style:italic;">Vælg overflade...</span>'}</p>
                         </div>
                         <div class="info-group">
                             <h3>Tilvalg</h3>
@@ -703,7 +703,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             Montage: <span style="font-family:monospace;">${c.montageItem || '-'}</span> | 
                             Låg 1: <span style="font-family:monospace;">${c.lidItem || '-'}</span>
                             ${c.lidItem2 ? ` | Låg 2: <span style="font-family:monospace;">${c.lidItem2}</span>` : ''} |
-                            Farve: <span>${c.color || 'Standard'}</span>
+                            Overflade: <span>${c.color || 'Standard'}</span>
                         </div>
                     </div>
                     <div style="display: flex; gap: 0.5rem;">
