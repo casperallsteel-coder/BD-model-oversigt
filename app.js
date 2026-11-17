@@ -1,4 +1,10 @@
-import { getSizes, addSize, deleteSize, getInlets, addInlet, deleteInlet, getConfigs, addConfig, deleteConfig, findConfigs, auth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from './db.js';
+import {
+    getSizes, addSize, deleteSize,
+    getInlets, addInlet, deleteInlet,
+    getOptions, addOption, deleteOption, configHasOption,
+    getConfigs, addConfig, deleteConfig, findConfigs,
+    auth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+} from './db.js';
 
 const IMAGE_INLETS = {
     '301': 'img/301.png', '302': 'img/302.png', '303': 'img/303.png', '304': 'img/304.png', '305': 'img/305.png',
@@ -78,6 +84,54 @@ const SVG_INLETS = {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
+    let currentModel = 'BD';
+    let currentEditId = null;
+    let configSearchTerm = '';
+    let configFilterSize = '';
+    let configFilterRooms = '';
+
+    // === Model Switcher (BD / FD) ===
+    const btnModelBD = document.getElementById('btn-model-bd');
+    const btnModelFD = document.getElementById('btn-model-fd');
+    const inputNewSize = document.getElementById('a-new-size');
+
+    async function setModel(model) {
+        if (currentModel === model) return;
+        currentModel = model;
+        currentEditId = null;
+
+        if (model === 'BD') {
+            btnModelBD.classList.add('active');
+            btnModelFD.classList.remove('active');
+        } else {
+            btnModelFD.classList.add('active');
+            btnModelBD.classList.remove('active');
+        }
+
+        document.querySelectorAll('.model-name').forEach(el => {
+            el.textContent = model;
+        });
+
+        if (inputNewSize) {
+            inputNewSize.placeholder = `F.eks. ${model} XXXL`;
+        }
+
+        configFilterSize = '';
+        configFilterRooms = '';
+        const filterSizeEl = document.getElementById('a-filter-size');
+        const filterRoomsEl = document.getElementById('a-filter-rooms');
+        if (filterSizeEl) filterSizeEl.value = '';
+        if (filterRoomsEl) filterRoomsEl.value = '';
+
+        await initUserView();
+        if (auth.currentUser && viewAdmin.classList.contains('active')) {
+            await loadAdminData();
+        }
+    }
+
+    btnModelBD.addEventListener('click', () => setModel('BD'));
+    btnModelFD.addEventListener('click', () => setModel('FD'));
+
     // === Navigation ===
     const btnNavUser = document.getElementById('btn-nav-user');
     const btnNavAdmin = document.getElementById('btn-nav-admin');
@@ -92,6 +146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             btnNavUser.style.fontWeight = '600';
             btnNavAdmin.style.color = '#9ca3af';
             btnNavAdmin.style.fontWeight = '500';
+            initUserView();
         } else {
             viewAdmin.classList.add('active');
             viewUser.classList.remove('active');
@@ -100,7 +155,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             btnNavUser.style.color = '#9ca3af';
             btnNavUser.style.fontWeight = '500';
             if (auth.currentUser) {
-                loadAdminData(); // Refresh dropdowns if logged in
+                loadAdminData();
             }
         }
     }
@@ -163,6 +218,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // === User View Logic ===
     const uRoomsSelect = document.getElementById('u-rooms');
     const uInletsContainer = document.getElementById('u-inlets-container');
+    const uFilterOptionsContainer = document.getElementById('u-filter-options-container');
     const btnFindConfig = document.getElementById('btn-find-config');
     const resWrapper = document.getElementById('u-results-wrapper');
     const notFoundContainer = document.getElementById('u-not-found-container');
@@ -170,7 +226,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function renderUserInletDropdowns() {
         const rooms = parseInt(uRoomsSelect.value);
-        const inlets = await getInlets();
+        const inlets = await getInlets(currentModel);
         
         let html = '';
         for (let i = 1; i <= rooms; i++) {
@@ -189,6 +245,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         notFoundContainer.classList.add('hidden');
     }
 
+    async function renderUserOptionsCheckboxes() {
+        const options = await getOptions(currentModel);
+        let html = `
+            <label style="display:flex; align-items:center; gap:0.5rem; font-weight:normal; cursor:pointer; margin-right: 1rem;">
+                <input type="checkbox" id="u-filter-none" style="width: auto; margin:0;"> Uden tilvalg
+            </label>
+        `;
+        options.forEach(opt => {
+            html += `
+                <label style="display:flex; align-items:center; gap:0.5rem; font-weight:normal; cursor:pointer; margin-right: 1rem;">
+                    <input type="checkbox" class="u-filter-option" data-option="${opt}" style="width: auto; margin:0;"> ${opt}
+                </label>
+            `;
+        });
+        uFilterOptionsContainer.innerHTML = html;
+    }
+
     uRoomsSelect.addEventListener('change', renderUserInletDropdowns);
 
     btnFindConfig.addEventListener('click', async () => {
@@ -197,30 +270,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         const selectedInlets = Array.from(selects).map(s => s.value);
         
         const filterSize = document.getElementById('u-filter-size').value;
-        const filterNone = document.getElementById('u-filter-none').checked;
-        const filterWheels = document.getElementById('u-filter-wheels').checked;
-        const filterWeight = document.getElementById('u-filter-weight').checked;
-        const filterGas = document.getElementById('u-filter-gas').checked;
+        const filterNoneEl = document.getElementById('u-filter-none');
+        const filterNone = filterNoneEl ? filterNoneEl.checked : false;
+        
+        const selectedOptions = Array.from(document.querySelectorAll('.u-filter-option:checked'))
+            .map(cb => cb.getAttribute('data-option'));
 
         const filters = {
             size: filterSize,
             none: filterNone,
-            wheels: filterWheels,
-            weight: filterWeight,
-            gas: filterGas
+            selectedOptions: selectedOptions
         };
 
-        const matchedConfigs = await findConfigs(rooms, selectedInlets, filters);
+        const matchedConfigs = await findConfigs(rooms, selectedInlets, filters, currentModel);
+        const availableOptions = await getOptions(currentModel);
 
         if (matchedConfigs.length > 0) {
             let html = '';
             
             matchedConfigs.forEach(config => {
-                let optionsText = [
-                    `Hjul: ${config.wheels ? 'Ja' : 'Nej'}`,
-                    `Vægtklods: ${config.weight ? 'Ja' : 'Nej'}`,
-                    `Gasdæmper: ${config.gas ? 'Ja' : 'Nej'}`
-                ].join(', ');
+                let optionsText = '';
+                if (availableOptions.length > 0) {
+                    optionsText = availableOptions.map(opt => {
+                        return `${opt}: ${configHasOption(config, opt) ? 'Ja' : 'Nej'}`;
+                    }).join(', ');
+                } else {
+                    optionsText = 'Ingen tilvalg defineret';
+                }
+
                 if (config.other) {
                     optionsText += `<br><strong>Andet:</strong> ${config.other}`;
                 }
@@ -264,7 +341,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 html += `
                 <div class="card-form" style="margin-bottom: 2rem; border-color: var(--primary-color); border-width: 2px;">
-                    <h2 style="color: var(--primary-color); margin-bottom: 1rem;">Fundet Løsning</h2>
+                    <h2 style="color: var(--primary-color); margin-bottom: 1rem;">Fundet Løsning (${currentModel})</h2>
                     
                     <div style="display: flex; width: 100%; height: 130px; border: 2px solid var(--text-main); border-radius: 8px; margin-bottom: 2rem; overflow: hidden; background-color: var(--bg-color);">
                         ${visualHtml}
@@ -315,7 +392,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     btnCreateProposal.addEventListener('click', () => {
-        // Skift til admin og forudfyld
         const rooms = uRoomsSelect.value;
         const selects = document.querySelectorAll('.u-inlet-select');
         const selectedInlets = Array.from(selects).map(s => s.value);
@@ -331,10 +407,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // === Admin View Logic ===
-
     const aConfigSizeSelect = document.getElementById('a-config-size');
     const aConfigRoomsSelect = document.getElementById('a-config-rooms');
     const aConfigInletsContainer = document.getElementById('a-config-inlets-container');
+    const aConfigOptionsContainer = document.getElementById('a-config-options-container');
     const aConfigMontageInput = document.getElementById('a-config-montage');
     const aConfigLidInput = document.getElementById('a-config-lid');
     const aConfigLid2Input = document.getElementById('a-config-lid-2');
@@ -343,7 +419,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnSaveConfig = document.getElementById('btn-save-config');
 
     async function loadAdminData() {
-        const sizes = await getSizes();
+        const sizes = await getSizes(currentModel);
         const sizeOptions = sizes.map(s => `<option value="${s}">${s}</option>`).join('');
         
         aConfigSizeSelect.innerHTML = `<option value="">-- Vælg Størrelse --</option>` + sizeOptions;
@@ -359,12 +435,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         
         await renderAdminInletDropdowns();
+        await renderAdminOptions();
         await renderConfigsList();
+    }
+
+    async function renderAdminOptions() {
+        const options = await getOptions(currentModel);
+        const deleteOptionSelect = document.getElementById('a-delete-option-select');
+        if (deleteOptionSelect) {
+            deleteOptionSelect.innerHTML = `<option value="">-- Vælg for at slette --</option>` + options.map(o => `<option value="${o}">${o}</option>`).join('');
+        }
+
+        if (options.length === 0) {
+            aConfigOptionsContainer.innerHTML = `<p style="font-size: 0.9rem; color: var(--text-muted); font-style: italic;">Ingen tilvalg oprettet for ${currentModel} endnu. Tilføj tilvalg under Administrer Grunddata til venstre.</p>`;
+        } else {
+            aConfigOptionsContainer.innerHTML = options.map(opt => `
+                <label style="display:flex; align-items:center; gap:0.5rem; font-weight:normal; cursor:pointer; margin-right: 1rem;">
+                    <input type="checkbox" class="a-config-option" data-option="${opt}" style="width: auto; margin:0;"> ${opt}
+                </label>
+            `).join('');
+        }
     }
 
     async function renderAdminInletDropdowns() {
         const rooms = parseInt(aConfigRoomsSelect.value);
-        const inlets = await getInlets();
+        const inlets = await getInlets(currentModel);
         const inletOptions = inlets.map(inl => `<option value="${inl.id}">${inl.id} - ${inl.name}</option>`).join('');
         
         const deleteInletSelect = document.getElementById('a-delete-inlet-select');
@@ -390,15 +485,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     aConfigRoomsSelect.addEventListener('change', renderAdminInletDropdowns);
 
-    // Admin forms - add size
+    // Admin forms - add/delete size
     const btnAddSize = document.getElementById('btn-add-size');
-    const inputNewSize = document.getElementById('a-new-size');
     btnAddSize.addEventListener('click', async () => {
         const sizeName = inputNewSize.value.trim();
         if (sizeName) {
-            await addSize(sizeName);
+            await addSize(sizeName, currentModel);
             inputNewSize.value = '';
             await loadAdminData();
+            await initUserView();
             alert("Størrelse tilføjet");
         }
     });
@@ -409,15 +504,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnDeleteSize.addEventListener('click', async () => {
             const size = selectDeleteSize.value;
             if (size) {
-                if(confirm(`Er du sikker på at du vil slette størrelsen "${size}"?`)) {
-                    await deleteSize(size);
+                if (confirm(`Er du sikker på at du vil slette størrelsen "${size}" fra ${currentModel}?`)) {
+                    await deleteSize(size, currentModel);
                     await loadAdminData();
+                    await initUserView();
                 }
             }
         });
     }
 
-    // Admin forms - add inlet
+    // Admin forms - add/delete inlet
     const btnAddInlet = document.getElementById('btn-add-inlet');
     const inputNewInletId = document.getElementById('a-new-inlet-id');
     const inputNewInletName = document.getElementById('a-new-inlet-name');
@@ -425,10 +521,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const id = inputNewInletId.value.trim();
         const name = inputNewInletName.value.trim();
         if (id && name) {
-            await addInlet(id, name);
+            await addInlet(id, name, currentModel);
             inputNewInletId.value = '';
             inputNewInletName.value = '';
             await renderAdminInletDropdowns();
+            await renderUserInletDropdowns();
             alert("Indkast tilføjet");
         }
     });
@@ -439,19 +536,48 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnDeleteInlet.addEventListener('click', async () => {
             const inletId = selectDeleteInlet.value;
             if (inletId) {
-                if(confirm(`Er du sikker på at du vil slette indkast "${inletId}"?`)) {
-                    await deleteInlet(inletId);
+                if (confirm(`Er du sikker på at du vil slette indkast "${inletId}" fra ${currentModel}?`)) {
+                    await deleteInlet(inletId, currentModel);
                     await renderAdminInletDropdowns();
+                    await renderUserInletDropdowns();
                 }
             }
         });
     }
 
-    let currentEditId = null;
-    let configSearchTerm = '';
-    let configFilterSize = '';
-    let configFilterRooms = '';
-    
+    // Admin forms - add/delete option (Tilvalg)
+    const btnAddOption = document.getElementById('btn-add-option');
+    const inputNewOption = document.getElementById('a-new-option');
+    if (btnAddOption) {
+        btnAddOption.addEventListener('click', async () => {
+            const optName = inputNewOption.value.trim();
+            if (optName) {
+                await addOption(optName, currentModel);
+                inputNewOption.value = '';
+                await renderAdminOptions();
+                await renderUserOptionsCheckboxes();
+                await renderConfigsList();
+                alert("Tilvalg tilføjet");
+            }
+        });
+    }
+
+    const btnDeleteOption = document.getElementById('btn-delete-option');
+    const selectDeleteOption = document.getElementById('a-delete-option-select');
+    if (btnDeleteOption) {
+        btnDeleteOption.addEventListener('click', async () => {
+            const optName = selectDeleteOption.value;
+            if (optName) {
+                if (confirm(`Er du sikker på at du vil slette tilvalget "${optName}" fra ${currentModel}?`)) {
+                    await deleteOption(optName, currentModel);
+                    await renderAdminOptions();
+                    await renderUserOptionsCheckboxes();
+                    await renderConfigsList();
+                }
+            }
+        });
+    }
+
     document.getElementById('a-search-configs').addEventListener('input', (e) => {
         configSearchTerm = e.target.value.toLowerCase();
         renderConfigsList();
@@ -476,9 +602,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const color = aConfigColorInput.value.trim();
         const other = aConfigOtherInput.value.trim();
         
-        const wheels = document.getElementById('a-config-wheels').checked;
-        const weight = document.getElementById('a-config-weight').checked;
-        const gas = document.getElementById('a-config-gas').checked;
+        const optionsMap = {};
+        document.querySelectorAll('.a-config-option').forEach(cb => {
+            const optName = cb.getAttribute('data-option');
+            optionsMap[optName] = cb.checked;
+        });
         
         const selects = document.querySelectorAll('.a-inlet-select');
         const selectedInlets = Array.from(selects).map(s => s.value);
@@ -501,13 +629,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             lidItem2: lid2,
             color: color,
             other: other,
-            wheels: wheels,
-            weight: weight,
-            gas: gas
+            options: optionsMap,
+            // Bevar bagudkompatibilitet med gamle BD-felter
+            wheels: !!optionsMap['Hjul'],
+            weight: !!optionsMap['Vægtklods'],
+            gas: !!optionsMap['Gasdæmper']
         };
 
-        await addConfig(config);
-        alert(currentEditId ? "BD Station opdateret!" : "BD Station gemt i databasen!");
+        await addConfig(config, currentModel);
+        alert(currentEditId ? `${currentModel} Station opdateret!` : `${currentModel} Station gemt i databasen!`);
         
         currentEditId = null;
         
@@ -517,9 +647,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         aConfigLid2Input.value = '';
         aConfigColorInput.value = '';
         aConfigOtherInput.value = '';
-        document.getElementById('a-config-wheels').checked = false;
-        document.getElementById('a-config-weight').checked = false;
-        document.getElementById('a-config-gas').checked = false;
+        document.querySelectorAll('.a-config-option').forEach(cb => cb.checked = false);
         aConfigSizeSelect.value = '';
         aConfigRoomsSelect.value = '3';
         renderAdminInletDropdowns();
@@ -528,7 +656,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function renderConfigsList() {
         const container = document.getElementById('a-configs-list-container');
-        const configs = await getConfigs();
+        const configs = await getConfigs(currentModel);
+        const availableOptions = await getOptions(currentModel);
         
         const filteredConfigs = configs.filter(c => {
             if (configFilterSize && c.size !== configFilterSize) return false;
@@ -542,7 +671,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         if (filteredConfigs.length === 0) {
-            container.innerHTML = '<p style="color: var(--text-muted);">Ingen matchende stationer fundet.</p>';
+            container.innerHTML = `<p style="color: var(--text-muted);">Ingen matchende ${currentModel} stationer fundet.</p>`;
             return;
         }
 
@@ -552,9 +681,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const fractionsText = c.roomFractions ? c.roomFractions.join(' | ') : Array(c.rooms).fill(`1/${c.rooms}`).join(' | ');
             
             const optionsArr = [];
-            if (c.wheels) optionsArr.push('Hjul');
-            if (c.weight) optionsArr.push('Vægtklods');
-            if (c.gas) optionsArr.push('Gasdæmper');
+            availableOptions.forEach(opt => {
+                if (configHasOption(c, opt)) {
+                    optionsArr.push(opt);
+                }
+            });
             
             let optionsText = optionsArr.length > 0 ? optionsArr.join(', ') : 'Ingen';
             if (c.other) {
@@ -590,7 +721,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const id = e.target.getAttribute('data-id');
                 const c = configs.find(x => x.id === id);
                 if (c && confirm(`Er du sikker på at du vil slette ${c.size} med indkast ${c.inlets.join(', ')}?`)) {
-                    await deleteConfig(id);
+                    await deleteConfig(id, currentModel);
                     renderConfigsList();
                 }
             });
@@ -608,6 +739,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 aConfigRoomsSelect.value = c.rooms.toString();
                 
                 await renderAdminInletDropdowns();
+                await renderAdminOptions();
                 
                 const selects = document.querySelectorAll('.a-inlet-select');
                 const fractions = document.querySelectorAll('.a-inlet-fraction');
@@ -628,9 +760,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 aConfigColorInput.value = c.color || '';
                 aConfigOtherInput.value = c.other || '';
                 
-                document.getElementById('a-config-wheels').checked = !!c.wheels;
-                document.getElementById('a-config-weight').checked = !!c.weight;
-                document.getElementById('a-config-gas').checked = !!c.gas;
+                document.querySelectorAll('.a-config-option').forEach(cb => {
+                    const optName = cb.getAttribute('data-option');
+                    cb.checked = configHasOption(c, optName);
+                });
 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
@@ -639,11 +772,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Init User view
     async function initUserView() {
-        const sizes = await getSizes();
+        const sizes = await getSizes(currentModel);
         const uFilterSize = document.getElementById('u-filter-size');
         if (uFilterSize) {
             uFilterSize.innerHTML = `<option value="">Alle Størrelser</option>` + sizes.map(s => `<option value="${s}">${s}</option>`).join('');
         }
+        await renderUserOptionsCheckboxes();
         await renderUserInletDropdowns();
     }
     initUserView();

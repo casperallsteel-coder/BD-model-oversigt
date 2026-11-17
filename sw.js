@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bd-configurator-v1';
+const CACHE_NAME = 'bd-configurator-v2';
 const ASSETS = [
     './',
     './index.html',

@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-import { getDatabase, ref, get, set, push, remove, child } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+import { getDatabase, ref, get, set, push, remove } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -18,9 +18,17 @@ const auth = getAuth(app);
 
 export { auth, signInWithEmailAndPassword, signOut, onAuthStateChanged };
 
+function getPath(base, model) {
+    return (!model || model === 'BD') ? base : `${model.toLowerCase()}_${base}`;
+}
+
+function sanitizeKey(str) {
+    return str.replace(/[.#$\[\]\/]/g, '_');
+}
+
 // --- Sizes ---
-export async function getSizes() {
-    const snapshot = await get(ref(db, 'sizes'));
+export async function getSizes(model = 'BD') {
+    const snapshot = await get(ref(db, getPath('sizes', model)));
     const sizes = [];
     if (snapshot.exists()) {
         snapshot.forEach((childSnapshot) => {
@@ -30,20 +38,19 @@ export async function getSizes() {
     return sizes.sort();
 }
 
-export async function addSize(sizeName) {
-    // Sanitér navnet lidt, da visse tegn (som '.', '#', '$', '[', or ']') ikke er tilladt i RTDB keys
-    const safeKey = sizeName.replace(/[.#$\[\]]/g, '_');
-    await set(ref(db, 'sizes/' + safeKey), { name: sizeName });
+export async function addSize(sizeName, model = 'BD') {
+    const safeKey = sanitizeKey(sizeName);
+    await set(ref(db, getPath('sizes', model) + '/' + safeKey), { name: sizeName });
 }
 
-export async function deleteSize(sizeName) {
-    const safeKey = sizeName.replace(/[.#$\[\]]/g, '_');
-    await remove(ref(db, 'sizes/' + safeKey));
+export async function deleteSize(sizeName, model = 'BD') {
+    const safeKey = sanitizeKey(sizeName);
+    await remove(ref(db, getPath('sizes', model) + '/' + safeKey));
 }
 
 // --- Inlets ---
-export async function getInlets() {
-    const snapshot = await get(ref(db, 'inlets'));
+export async function getInlets(model = 'BD') {
+    const snapshot = await get(ref(db, getPath('inlets', model)));
     const inlets = [];
     if (snapshot.exists()) {
         snapshot.forEach((childSnapshot) => {
@@ -53,19 +60,84 @@ export async function getInlets() {
     return inlets.sort((a, b) => a.id.localeCompare(b.id));
 }
 
-export async function addInlet(id, name) {
-    const safeKey = id.replace(/[.#$\[\]]/g, '_');
-    await set(ref(db, 'inlets/' + safeKey), { id, name });
+export async function addInlet(id, name, model = 'BD') {
+    const safeKey = sanitizeKey(id);
+    await set(ref(db, getPath('inlets', model) + '/' + safeKey), { id, name });
 }
 
-export async function deleteInlet(inletId) {
-    const safeKey = inletId.replace(/[.#$\[\]]/g, '_');
-    await remove(ref(db, 'inlets/' + safeKey));
+export async function deleteInlet(inletId, model = 'BD') {
+    const safeKey = sanitizeKey(inletId);
+    await remove(ref(db, getPath('inlets', model) + '/' + safeKey));
+}
+
+// --- Options (Tilvalg) ---
+const DEFAULT_BD_OPTIONS = ['Hjul', 'Vægtklods', 'Gasdæmper'];
+
+export async function getOptions(model = 'BD') {
+    const snapshot = await get(ref(db, getPath('options', model)));
+    const options = [];
+    if (snapshot.exists()) {
+        snapshot.forEach((childSnapshot) => {
+            options.push(childSnapshot.val().name);
+        });
+    } else if (model === 'BD') {
+        return [...DEFAULT_BD_OPTIONS];
+    }
+    return options;
+}
+
+export async function addOption(optionName, model = 'BD') {
+    if (model === 'BD') {
+        const snapshot = await get(ref(db, getPath('options', 'BD')));
+        if (!snapshot.exists()) {
+            for (const defOpt of DEFAULT_BD_OPTIONS) {
+                const k = sanitizeKey(defOpt);
+                await set(ref(db, getPath('options', 'BD') + '/' + k), { name: defOpt });
+            }
+        }
+    }
+    const safeKey = sanitizeKey(optionName);
+    await set(ref(db, getPath('options', model) + '/' + safeKey), { name: optionName });
+}
+
+export async function deleteOption(optionName, model = 'BD') {
+    if (model === 'BD') {
+        const snapshot = await get(ref(db, getPath('options', 'BD')));
+        if (!snapshot.exists()) {
+            for (const defOpt of DEFAULT_BD_OPTIONS) {
+                if (defOpt !== optionName) {
+                    const k = sanitizeKey(defOpt);
+                    await set(ref(db, getPath('options', 'BD') + '/' + k), { name: defOpt });
+                }
+            }
+            return;
+        }
+    }
+    const safeKey = sanitizeKey(optionName);
+    await remove(ref(db, getPath('options', model) + '/' + safeKey));
+}
+
+export function configHasOption(config, optName) {
+    if (config.options && typeof config.options[optName] !== 'undefined') {
+        return !!config.options[optName];
+    }
+    if (optName === 'Hjul') return !!config.wheels;
+    if (optName === 'Vægtklods') return !!config.weight;
+    if (optName === 'Gasdæmper') return !!config.gas;
+    return false;
+}
+
+export function configHasAnyOption(config, availableOptions = []) {
+    if (config.wheels || config.weight || config.gas) return true;
+    if (config.options) {
+        if (Object.values(config.options).some(v => !!v)) return true;
+    }
+    return availableOptions.some(opt => configHasOption(config, opt));
 }
 
 // --- Configurations ---
-export async function getConfigs() {
-    const snapshot = await get(ref(db, 'configs'));
+export async function getConfigs(model = 'BD') {
+    const snapshot = await get(ref(db, getPath('configs', model)));
     const configs = [];
     if (snapshot.exists()) {
         snapshot.forEach((childSnapshot) => {
@@ -77,50 +149,44 @@ export async function getConfigs() {
     return configs;
 }
 
-export async function addConfig(config) {
+export async function addConfig(config, model = 'BD') {
+    const path = getPath('configs', model);
     if (config.id) {
-        // Updating existing
-        await set(ref(db, 'configs/' + config.id), config);
+        await set(ref(db, path + '/' + config.id), config);
     } else {
-        // Creating new
-        const newRef = push(ref(db, 'configs'));
+        const newRef = push(ref(db, path));
         config.id = newRef.key;
         await set(newRef, config);
     }
 }
 
-export async function deleteConfig(id) {
-    await remove(ref(db, 'configs/' + id));
+export async function deleteConfig(id, model = 'BD') {
+    await remove(ref(db, getPath('configs', model) + '/' + id));
 }
 
-export async function findConfigs(rooms, inletsArray, filters = {}) {
-    const configs = await getConfigs();
-    
+export async function findConfigs(rooms, inletsArray, filters = {}, model = 'BD') {
+    const configs = await getConfigs(model);
+    const availableOptions = await getOptions(model);
+
     return configs.filter(c => {
-        // Filtrer først på antal rum
         if (parseInt(c.rooms) !== parseInt(rooms)) return false;
-        
-        // Tjek hvert indkast
+
         for (let i = 0; i < inletsArray.length; i++) {
-            // Hvis der er valgt et indkast i søgningen, og det ikke matcher stellets indkast
             if (inletsArray[i] !== "" && c.inlets[i] !== inletsArray[i]) {
                 return false;
             }
         }
-        
-        // Avancerede filtre
+
         if (filters.size && c.size !== filters.size) return false;
-        
+
         if (filters.none) {
-            // "Uden tilvalg" krydset af -> Afvis stationer der HAR nogle tilvalg
-            if (c.wheels || c.weight || c.gas) return false;
-        } else {
-            // Almindelige filtre (viser kun stationer der OGSÅ har disse)
-            if (filters.wheels && !c.wheels) return false;
-            if (filters.weight && !c.weight) return false;
-            if (filters.gas && !c.gas) return false;
+            if (configHasAnyOption(c, availableOptions)) return false;
+        } else if (filters.selectedOptions && filters.selectedOptions.length > 0) {
+            for (const reqOpt of filters.selectedOptions) {
+                if (!configHasOption(c, reqOpt)) return false;
+            }
         }
-        
+
         return true;
     });
 }

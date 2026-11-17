@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BD Konfigurator - Ropox</title>
+    <title>BD / FD Konfigurator - Ropox</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -14,12 +14,19 @@
 </head>
 <body>
     <header class="topbar">
-        <div class="logo-container">
-            <span class="logo-text">all steel</span>
-            <span class="logo-subtext">BY ROPOX</span>
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <div class="logo-container">
+                <span class="logo-text">all steel</span>
+                <span class="logo-subtext">BY ROPOX</span>
+            </div>
+            <!-- Model Switcher (BD / FD) -->
+            <div class="model-switcher">
+                <button id="btn-model-bd" class="model-switch-btn active" data-model="BD">BD Serie</button>
+                <button id="btn-model-fd" class="model-switch-btn" data-model="FD">FD Serie</button>
+            </div>
         </div>
         <nav style="display:flex;align-items:center;gap:0.5rem;">
-            <button id="btn-nav-user" class="nav-button" style="font-weight: 600; color: var(--primary-color);">Søgning BD</button>
+            <button id="btn-nav-user" class="nav-button" style="font-weight: 600; color: var(--primary-color);">Søgning <span class="model-name">BD</span></button>
             <button id="btn-nav-admin" class="nav-button" style="font-size:0.9rem;color:#9ca3af;text-decoration:none;">⚙ Konfigurator (Admin)</button>
         </nav>
     </header>
@@ -28,8 +35,10 @@
         <!-- View: Bruger (User) -->
         <section id="view-user" class="view active">
             <div class="header-action">
-                <h1>Find BD Affaldsstation</h1>
-                <p style="color: var(--text-muted); margin-top: 0.5rem;">Vælg hvor mange fraktioner/rum kunden ønsker, og vælg derefter indkast for at finde den korrekte BD station.</p>
+                <div>
+                    <h1>Find <span class="model-name">BD</span> Affaldsstation</h1>
+                    <p style="color: var(--text-muted); margin-top: 0.5rem;">Vælg hvor mange fraktioner/rum kunden ønsker, og vælg derefter indkast for at finde den korrekte <span class="model-name">BD</span> station.</p>
+                </div>
             </div>
             
             <div class="card-form">
@@ -59,19 +68,8 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-row" style="margin-bottom: 1.5rem; flex-wrap: wrap;">
-                    <label style="display:flex; align-items:center; gap:0.5rem; font-weight:normal; cursor:pointer; margin-right: 1rem;">
-                        <input type="checkbox" id="u-filter-none" style="width: auto; margin:0;"> Uden tilvalg
-                    </label>
-                    <label style="display:flex; align-items:center; gap:0.5rem; font-weight:normal; cursor:pointer; margin-right: 1rem;">
-                        <input type="checkbox" id="u-filter-wheels" style="width: auto; margin:0;"> Hjul
-                    </label>
-                    <label style="display:flex; align-items:center; gap:0.5rem; font-weight:normal; cursor:pointer; margin-right: 1rem;">
-                        <input type="checkbox" id="u-filter-weight" style="width: auto; margin:0;"> Vægtklods
-                    </label>
-                    <label style="display:flex; align-items:center; gap:0.5rem; font-weight:normal; cursor:pointer;">
-                        <input type="checkbox" id="u-filter-gas" style="width: auto; margin:0;"> Gasdæmper
-                    </label>
+                <div id="u-filter-options-container" class="form-row" style="margin-bottom: 1.5rem; flex-wrap: wrap;">
+                    <!-- Dynamiske tilvalg-checkboxes genereres via JS -->
                 </div>
 
                 <div class="form-actions" style="margin-top: 1rem;">
@@ -87,7 +85,7 @@
             <!-- Not found container -->
             <div id="u-not-found-container" class="card-form hidden" style="margin-top: 2rem; border-color: var(--danger); text-align: center;">
                 <h2 style="color: var(--danger); margin-bottom: 1rem;">Ingen løsning fundet</h2>
-                <p style="margin-bottom: 1.5rem;">Der findes endnu ikke en færdig BD station med præcis denne kombination af indkast.</p>
+                <p style="margin-bottom: 1.5rem;">Der findes endnu ikke en færdig <span class="model-name">BD</span> station med præcis denne kombination af indkast.</p>
                 <button id="btn-create-proposal" class="primary-button">Ønsker du denne oprettet?</button>
             </div>
         </section>
@@ -95,7 +93,7 @@
         <!-- View: Konfigurator (Admin) -->
         <section id="view-admin" class="view">
             <div class="header-action">
-                <h1>Konfigurator (Databasestyring)</h1>
+                <h1>Konfigurator - <span class="model-name">BD</span> Serie (Databasestyring)</h1>
                 <button id="btn-logout" class="secondary-button" style="display: none;">Log Ud</button>
             </div>
             
@@ -119,7 +117,7 @@
                 <div class="detail-grid">
                 <!-- Administrer Grunddata -->
                 <div class="card-form" style="padding: 1.5rem;">
-                    <h2 style="margin-bottom: 1rem; color: var(--text-main);">Administrer Grunddata</h2>
+                    <h2 style="margin-bottom: 1rem; color: var(--text-main);">Administrer Grunddata (<span class="model-name">BD</span>)</h2>
                     
                     <div class="form-group">
                         <label>Tilføj ny Stel Størrelse</label>
@@ -153,11 +151,27 @@
                             <button id="btn-delete-inlet" class="danger-button">Slet</button>
                         </div>
                     </div>
+
+                    <div class="form-group" style="margin-top: 2rem;">
+                        <label>Tilføj nyt Tilvalg / Udstyr</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" id="a-new-option" placeholder="F.eks. Hjul, Lås, Poseholder...">
+                            <button id="btn-add-option" class="secondary-button">Tilføj</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">
+                        <label>Slet eksisterende Tilvalg</label>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <select id="a-delete-option-select" style="flex: 1;"></select>
+                            <button id="btn-delete-option" class="danger-button">Slet</button>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Opret ny BD Station -->
+                <!-- Opret ny Station -->
                 <div class="card-form" style="padding: 1.5rem; border-color: var(--primary-color);">
-                    <h2 style="margin-bottom: 1rem; color: var(--primary-color);">Opret Færdigt Stel</h2>
+                    <h2 style="margin-bottom: 1rem; color: var(--primary-color);">Opret Færdigt <span class="model-name">BD</span> Stel</h2>
                     
                     <div class="form-group">
                         <label>Stel Størrelse</label>
@@ -203,16 +217,8 @@
                         <input type="text" id="a-config-color" placeholder="F.eks. Sort (RAL 9005)">
                     </div>
                     
-                    <div class="form-row" style="margin-bottom: 1.5rem;">
-                        <label style="display:flex; align-items:center; gap:0.5rem; font-weight:normal; cursor:pointer;">
-                            <input type="checkbox" id="a-config-wheels" style="width: auto; margin:0;"> Hjul
-                        </label>
-                        <label style="display:flex; align-items:center; gap:0.5rem; font-weight:normal; cursor:pointer;">
-                            <input type="checkbox" id="a-config-weight" style="width: auto; margin:0;"> Vægtklods
-                        </label>
-                        <label style="display:flex; align-items:center; gap:0.5rem; font-weight:normal; cursor:pointer;">
-                            <input type="checkbox" id="a-config-gas" style="width: auto; margin:0;"> Gasdæmper
-                        </label>
+                    <div id="a-config-options-container" class="form-row" style="margin-bottom: 1.5rem; flex-wrap: wrap;">
+                        <!-- Dynamiske tilvalg-checkboxes genereres via JS -->
                     </div>
 
                     <div class="form-group">
@@ -220,13 +226,13 @@
                         <input type="text" id="a-config-other" placeholder="F.eks. Lås, specielle fødder, etc.">
                     </div>
 
-                    <button id="btn-save-config" class="primary-button w-full" style="margin-top: 1rem;">Gem BD Station i Database</button>
+                    <button id="btn-save-config" class="primary-button w-full" style="margin-top: 1rem;">Gem <span class="model-name">BD</span> Station i Database</button>
                 </div>
             </div>
 
             <!-- Liste over gemte konfigurationer -->
             <div class="card-form" style="margin-top: 2rem;">
-                <h2 style="margin-bottom: 1rem; color: var(--text-main);">Gemte BD Stationer</h2>
+                <h2 style="margin-bottom: 1rem; color: var(--text-main);">Gemte <span class="model-name">BD</span> Stationer</h2>
                 
                 <div class="form-row" style="margin-bottom: 1rem;">
                     <div class="form-group" style="flex: 1;">
@@ -243,6 +249,8 @@
                             <option value="2">2 rum</option>
                             <option value="3">3 rum</option>
                             <option value="4">4 rum</option>
+                            <option value="5">5 rum</option>
+                            <option value="6">6 rum</option>
                         </select>
                     </div>
                 </div>
